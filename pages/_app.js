@@ -3,6 +3,7 @@ import Layout from '../Layout'
 import '../styles/globals.css'
 import theme from '../theme'
 import {SessionProvider} from 'next-auth/react'
+import 'sweetalert2/src/sweetalert2.scss'
 
 function MyApp({ Component, pageProps }) {
     return (

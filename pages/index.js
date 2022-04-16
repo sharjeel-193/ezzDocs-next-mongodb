@@ -1,21 +1,19 @@
 import { Box, Typography, useTheme, Container, Button, Tab, Modal, Backdrop, Fade, Input, TextField} from '@mui/material'
 import {MdAdd} from 'react-icons/md'
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
 import { useState } from 'react'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
-import { useSession, getProviders, getSession } from "next-auth/react"
-import Login from '../components/Login'
+import { getSession } from "next-auth/react"
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 
-export default function Home() {
+export default function Home(props) {
+    const {session} = props
     const theme = useTheme()
-    const {data: session} = useSession()
     const [tabValue, setTabValue] = useState('1')
     const [showModal, setShowModal] = useState(false)
-    const [docNameInput, setDocNameInput] = useState('')
-    // console.log(({providers}))
+    const [projectNameInput, setProjectNameInput] = useState('')
+    const MySwal = withReactContent(Swal)
     const handleChange = (event, newValue) => {
         setTabValue(newValue);
     };
@@ -25,37 +23,44 @@ export default function Home() {
     const closeModal = () => {
         setShowModal(false)
     }
-    if(!session){
-        return (
-            <Login />
-        )
-    }
-    const createDoc = async () => {
+    const createProject = async () => {
         console.log('Inside Create Function')
-        try {
-            const res = await fetch('/api/doc', {
-                method: 'POST',
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    title: docNameInput
-                })
+        fetch('/api/projects/add', {
+            method: 'POST',
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: projectNameInput,
             })
-            // const res = await fetch('/api/doc', {
-            //     method: 'GET',
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //       },
-            // })
-            console.log(res)
-            // router.push("/");
-        } catch (error) {
-            console.log(error);
-        }
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            
+            if(data.statusCode == 201){
+                console.log({Data: data})
+                closeModal()
+                createAlert('success', data.message)
+            } else {
+                console.log({Error: data})
+                closeModal()
+                createAlert('error', data.message)
+                
+            }
+        })
+        
     }
-    const createDocModal = (
+    const createAlert = (type, message) => {
+        MySwal.fire({
+            title: '',
+            text: message,
+            icon: type=='error'?'error':'success',
+            confirmButtonText: 'Ok'
+        })
+        
+    }
+    const createProjectModal = (
         <Modal
             open={showModal}
             onClose={closeModal}
@@ -79,13 +84,13 @@ export default function Home() {
                         borderRadius: 3
                     }}
                 >
-                    <Typography variant="h5" component="h2" marginBottom={3}>Create New Document</Typography>
+                    <Typography variant="h5" component="h2" marginBottom={3}>Create New Project</Typography>
                     <TextField 
                         type={'text'} 
                         variant='outlined' 
                         fullWidth 
-                        label='Document Name'
-                        onChange={(e) => setDocNameInput(e.target.value)}    
+                        label='Project Name'
+                        onChange={(e) => setProjectNameInput(e.target.value)}    
                     />
                     <Box
                         sx={{
@@ -94,7 +99,7 @@ export default function Home() {
                         }}
                         marginTop={3}
                     >
-                        <Button variant='contained' sx={{textTransform: 'capitalize'}} onClick={createDoc}>Create</Button>
+                        <Button variant='contained' sx={{textTransform: 'capitalize'}} onClick={createProject}>Create</Button>
                     </Box>
                 </Box>
             </Fade>
@@ -108,7 +113,7 @@ export default function Home() {
                     padding: '36px 0',
                 }}
             >
-                {createDocModal}
+                {createProjectModal}
                 <Container>
                     <Box>
                         <Typography 
@@ -175,9 +180,19 @@ export default function Home() {
     )
 }
 
-// Home.getInitialProps = async (context) => {
-//     return {
-//         providers: await getProviders(context),
-//         // session: await getSession(context)
-//     }
-//   }
+export async function getServerSideProps(context) {
+    const session = await getSession(context)
+  
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/login',
+                permanent: false,
+            },
+        }
+    }
+  
+    return {
+        props: { session }
+    }
+}

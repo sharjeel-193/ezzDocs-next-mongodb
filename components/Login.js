@@ -3,9 +3,19 @@ import Image from 'next/image'
 import SecondaryLogo from '../public/images/secondary-logo.png'
 import {FaGoogle, FaFacebookF, FaApple} from 'react-icons/fa'
 import { signIn } from 'next-auth/react'
+import { useRouter } from "next/router"
 
 function Login() {
     const theme = useTheme()
+    const router = useRouter()
+    const logIn = async (provider) => {
+        try {
+            await signIn(provider)
+            console.log('Successful Login')
+        } catch (error) {
+            console.log('Error')
+        }
+    }
     return (
         <div className='h-full w-full'>
             <Box
@@ -41,7 +51,7 @@ function Login() {
                         }
                     }}
                     startIcon={<FaGoogle />}
-                    onClick={() => signIn("google")}
+                    onClick={() => logIn("google")}
                 >
                     Sign in with Google
                 </Button>
@@ -57,7 +67,7 @@ function Login() {
                         }
                     }}
                     startIcon={<FaFacebookF />}
-                    onClick={() => signIn("facebook")}
+                    onClick={() => logIn("facebook")}
                 >
                     Sign in with Facebook
                 </Button>
