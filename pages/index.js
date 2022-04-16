@@ -120,7 +120,7 @@ export default function Home() {
                                 transition: 'all 0.2s linear'
                             }}
                         >
-                            Welcome,
+                            Welcome, {session?.user?._id}
                         </Typography>
                         <Typography variant='h3' color={theme.palette.secondary.light} marginLeft={2}>
                             {session?.user?.name || 'M. Sharjeel Maqsood'}
