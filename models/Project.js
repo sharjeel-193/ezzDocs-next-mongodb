@@ -7,7 +7,7 @@ const projectSchema = new mongoose.Schema({
     },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'user',
         required: true
     },
     private: {
@@ -18,7 +18,7 @@ const projectSchema = new mongoose.Schema({
     collaborators: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'users',
+            ref: 'User',
         }
     ],
     createdAt: {

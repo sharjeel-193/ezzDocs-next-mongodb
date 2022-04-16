@@ -5,10 +5,12 @@ import { TabContext, TabList, TabPanel } from '@mui/lab'
 import { getSession } from "next-auth/react"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import MyProjects from '../components/MyProjects'
+import { server } from '../util/server'
 
 
 export default function Home(props) {
-    const {session} = props
+    const {session, myProjects} = props
     const theme = useTheme()
     const [tabValue, setTabValue] = useState('1')
     const [showModal, setShowModal] = useState(false)
@@ -146,7 +148,7 @@ export default function Home(props) {
                             }}
                             onClick={openModal}
                         >
-                            Create a New Document
+                            Create a New Project
                         </Button>
                     </Box>
                 </Container>  
@@ -162,12 +164,13 @@ export default function Home(props) {
                     <TabContext value={tabValue}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider', textTransform: 'capitalize' }}>
                             <TabList onChange={handleChange}>
-                                <Tab label={<Typography textTransform={'capitalize'}>My Documents</Typography>} value='1' />
+                                <Tab label={<Typography textTransform={'capitalize'}>My Projects</Typography>} value='1' />
                                 <Tab label={<Typography textTransform={'capitalize'}>Shared with Me</Typography>} value='2' />
                             </TabList>
                         </Box>
                         <TabPanel value='1'>
-                            <Typography variant='h1'>TAB 1</Typography>
+                            {myProjects.projects &&
+                            <MyProjects projects={myProjects.projects} />}
                         </TabPanel>
                         <TabPanel value='2'>
                             <Typography variant='h1'>TAB 2</Typography>
@@ -182,7 +185,6 @@ export default function Home(props) {
 
 export async function getServerSideProps(context) {
     const session = await getSession(context)
-  
     if (!session) {
         return {
             redirect: {
@@ -191,8 +193,18 @@ export async function getServerSideProps(context) {
             },
         }
     }
-  
+    const options = { 
+        headers:{ 
+            cookie: context.req.headers.cookie 
+        },
+        method: 'GET'
+    };
+    const myProjectRes = await fetch(`${server}/api/projects`, options)
+    const myProjects = await myProjectRes.json()
     return {
-        props: { session }
+        props: { 
+            session,
+            myProjects: myProjects
+        }
     }
 }
