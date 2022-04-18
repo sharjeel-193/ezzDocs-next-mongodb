@@ -1,4 +1,5 @@
 import { Box, Typography, useTheme } from "@mui/material"
+import Link from "next/link"
 
 function MyProjects(props) {
     const theme = useTheme()
@@ -27,14 +28,19 @@ function MyProjects(props) {
                         transition: 'all 0.3s linear'
                     }}
                 >
-                    <Typography 
-                        variant="h5" 
-                        component="h3"
-                        margin={0}
-                        color={theme.palette.primary.main}
-                    >
-                        {project.name}
-                    </Typography>
+                    <Link href={`/project/${project._id}`} passHref>
+                        <Typography 
+                            variant="h5" 
+                            component="h3"
+                            margin={0}
+                            color={theme.palette.primary.main}
+                            sx={{
+                                cursor: 'pointer'
+                            }}
+                        >
+                            {project.name}
+                        </Typography>
+                    </Link>
                 </Box>
             ))}
         </Box>

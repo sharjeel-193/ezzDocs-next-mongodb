@@ -1,4 +1,4 @@
-import { useTheme, Box, Hidden, Menu, MenuItem, Grow, Paper, Popper, ClickAwayListener, MenuList, ListItemIcon } from "@mui/material"
+import { useTheme, Box, Hidden, Menu, MenuItem, Grow, Paper, Popper, ClickAwayListener, MenuList, ListItemIcon, Button } from "@mui/material"
 import HoverMenu from 'material-ui-popup-state/HoverMenu'
 import {
     usePopupState,
@@ -74,43 +74,65 @@ function Header() {
                     </Link>
                 </Hidden>
             </Box>
-            <Box
-                sx={{
-                    position: 'relative',
-                    width: '60px',
-                    height: '60px',
-                    borderRadius: '50px',
-                    overflow: 'hidden',
-                    transition: 'all 0.2s linear',
-                    marginRight: '20px',
-                    cursor: 'pointer',
-                    [theme.breakpoints.down('md')]:{
-                        width: '40px',
-                        height: '40px'
-                    }
-                }}
-                {...bindHover(popupState)}
-            >
-                <Image src={session?.user?.image || ProfileDummy} alt="Profile Photo" layout="fill" />
-            </Box>
-            <HoverMenu
-                {...bindMenu(popupState)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            >
-                <MenuItem>
-                    <ListItemIcon>
-                        <MdSettings />
-                    </ListItemIcon>
-                    Settings
-                </MenuItem>
-                <MenuItem onClick={signOut}>
-                    <ListItemIcon>
-                        <MdLogout />
-                    </ListItemIcon>
-                    Log out
-                </MenuItem>
-            </HoverMenu>
+            {session?(
+                <Box>
+                    <Box
+                        sx={{
+                            position: 'relative',
+                            width: '60px',
+                            height: '60px',
+                            borderRadius: '50px',
+                            overflow: 'hidden',
+                            transition: 'all 0.2s linear',
+                            marginRight: '20px',
+                            cursor: 'pointer',
+                            [theme.breakpoints.down('md')]:{
+                                width: '40px',
+                                height: '40px'
+                            }
+                        }}
+                        {...bindHover(popupState)}
+                    >
+                        <Image src={session?.user?.image || ProfileDummy} alt="Profile Photo" layout="fill" />
+                    </Box>
+                    <HoverMenu
+                        {...bindMenu(popupState)}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                    >
+                        <MenuItem>
+                            <ListItemIcon>
+                                <MdSettings />
+                            </ListItemIcon>
+                            Settings
+                        </MenuItem>
+                        <MenuItem onClick={signOut}>
+                            <ListItemIcon>
+                                <MdLogout />
+                            </ListItemIcon>
+                            Log out
+                        </MenuItem>
+                    </HoverMenu>
+                </Box>
+            ):(
+                <Link href={'/login'} passHref>
+                    <Button
+                        variant="outlined"
+                        
+                        sx={{
+                            marginRight: '20px',
+                            color: theme.palette.primary.light,
+                            borderColor: theme.palette.primary.light,
+                            '&:hover':{
+                                backgroundColor: 'black',
+                                borderColor: theme.palette.primary.light,
+                            }
+                        }}
+                    >
+                        Sign In
+                    </Button>
+                </Link>
+            )}
         </Box>
     )
 }

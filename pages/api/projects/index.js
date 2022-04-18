@@ -16,13 +16,6 @@ const listProjects =  async (req, res) => {
     }
 
     if (req.method === "GET") {
-        const project = new Project({
-            name: req.body.name,
-            owner: user,
-            private: true,
-            createdAt: new Date(),
-            collaborators: []
-        });
 
         try {
             const response = await Project

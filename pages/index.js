@@ -201,6 +201,7 @@ export async function getServerSideProps(context) {
     };
     const myProjectRes = await fetch(`${server}/api/projects`, options)
     const myProjects = await myProjectRes.json()
+    console.log({Projects: myProjects})
     return {
         props: { 
             session,
