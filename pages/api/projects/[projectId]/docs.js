@@ -3,6 +3,8 @@ import { getSession, useSession } from "next-auth/react";
 // import Project from '../../../../models/Project'
 // import User from '../../../../models/User'
 import Document from '../../../../models/Document'
+import Project from "../../../../models/Project";
+import User from "../../../../models/User";
 import dbConnect from "../../../../util/dbConnect";
 
 const listDocuments =  async (req, res) => {
@@ -22,6 +24,14 @@ const listDocuments =  async (req, res) => {
         try {
             const response = await Document
                 .find({project: projectID})
+                .populate({
+                    path: 'project',
+                    model: Project,
+                    populate: {
+                        path: 'owner',
+                        model: User
+                    }
+                })
             res.status(200).json({
                 documents: response, 
                 message: 'Documents Fetched Successfully',

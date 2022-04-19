@@ -19,6 +19,10 @@ const documentSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: new Date()
+    },
+    active:{
+        type: Boolean,
+        default: true
     }
 })
 

@@ -2,6 +2,7 @@ import { Box, Container, IconButton, Paper, Typography, useMediaQuery, useTheme,
 import moment from "moment"
 import { route } from "next/dist/server/router";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import {MdOutlineAdd} from 'react-icons/md'
@@ -23,23 +24,7 @@ const Project = (props) => {
     const closeModal = () => {
         setShowModal(false)
     }
-    const docs = [
-        {
-            name: 'Doc2',
-            date: new Date()
-        },
-        {
-            name: 'Doc2',
-            date: new Date()
-        },
-        {
-            name: 'Doc3',
-            date: new Date()
-        },
-    ]
-    const fetchProject = () => {
-
-    }
+   
     const createDocument = async () => {
         console.log('Inside Create Doc Function')
         fetch(`/api/projects/${proId}/add`, {
@@ -228,10 +213,12 @@ const Project = (props) => {
                                                     <Box 
                                                         textAlign={'left'} 
                                                         width={reqResp?'100%':'fit-content'} 
-                                                        sx={{transition: 'all 0.2s linear'}}
+                                                        sx={{transition: 'all 0.2s linear', cursor: 'pointer'}}
                                                         
                                                     >
-                                                        <Typography variant="h6" component={'h3'}>{doc.name}</Typography>
+                                                        <Link href={`/project/${project.project._id}/doc/${doc._id}`} passHref>
+                                                            <Typography variant="h6" component={'h3'}>{doc.name}</Typography>
+                                                        </Link>
                                                     </Box>
                                                     <br></br>
                                                     <Box 
@@ -274,6 +261,14 @@ export async function getServerSideProps(context){
     const projectID = context.params.proId
     const projectResponse = await fetch(`${server}/api/projects/${projectID}`, options);
     const project  = await projectResponse.json()
+    if(project.statusCode!=200){
+        return {
+            props: {
+                project,
+                documents: {}
+            }
+        }
+    }
     const documentResponse = await fetch(`${server}/api/projects/${projectID}/docs`, options);
     const documents = await documentResponse.json()
     console.log({Project: project})

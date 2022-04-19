@@ -47,7 +47,7 @@ export default function Home(props) {
             } else {
                 console.log({Error: data})
                 closeModal()
-                createAlert('error', data.message)
+                createAlert('error', data.error)
                 
             }
         })
