@@ -1,10 +1,11 @@
-import { Box, Container, useTheme, Typography } from '@mui/material'
+import { Box, Container, useTheme, Typography, Paper } from '@mui/material'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import ErrorBox from '../../../../components/ErrorBox'
 import Loading from '../../../../components/Loading'
 import { server } from '../../../../util/server'
+import TextEditor from '../../../../components/TextEditor'
 
 function Document(props) {
     const {documents} = props
@@ -12,15 +13,18 @@ function Document(props) {
     const theme = useTheme()
     const router = useRouter()
     const { docId } = router.query
+    const updateEditorData = (content) => {
+        setEditorData(content)
+    }
     useEffect(() => {
         if(documents.documents){
             setCurrentDoc(documents.documents.filter(doc => doc._id == docId)[0])
-            console.log({'Current Doc': currentDoc})
+            console.log({Current: currentDoc})
         }
     }, [documents, docId, currentDoc])
     return (
         <div>
-            {!documents.error?(
+            {documents.statusCode==200?(
                 <div>
                     {currentDoc?(
                         <div>
@@ -80,8 +84,23 @@ function Document(props) {
                                 </Container>
                                 
                             </Box>
-                            <Box>
-                                
+                            <Box
+                                sx={{
+                                    marginTop: '-20px'
+                                }}
+                            >
+                                <Container>
+                                    <TextEditor doc={currentDoc} />
+                                    {/* <Paper
+                                        sx={{
+                                            width: '95%',
+                                            margin: '0 auto',
+                                            borderRadius: '0'
+                                        }}
+                                    >
+                                        
+                                    </Paper> */}
+                                </Container>
                             </Box>
 
                         </div>

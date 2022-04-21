@@ -9,10 +9,13 @@ import {MdOutlineAdd} from 'react-icons/md'
 import ErrorBox from "../../../components/ErrorBox";
 import Loading from "../../../components/Loading";
 import { server } from "../../../util/server";
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const Project = (props) => {
     const theme = useTheme();
     const router = useRouter()
+    const MySwal = withReactContent(Swal)
     const {project, documents} = props
     const { proId } = router.query
     const reqResp = useMediaQuery(theme.breakpoints.down('md'))
@@ -45,14 +48,23 @@ const Project = (props) => {
                 console.log({Data: data})
                 closeModal()
                 router.replace(router.asPath)
-                // createAlert('success', data.message)
+                createAlert('success', data.message)
             } else {
                 console.log({Error: data})
                 closeModal()
-                // createAlert('error', data.message)
+                createAlert('error', data.error)
                 
             }
         })
+    }
+    const createAlert = (type, message) => {
+        MySwal.fire({
+            title: '',
+            text: message,
+            icon: type=='error'?'error':'success',
+            confirmButtonText: 'Ok'
+        })
+        
     }
     const createDocumentModal = (
         <Modal

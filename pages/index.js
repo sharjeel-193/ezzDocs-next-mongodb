@@ -7,11 +7,13 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import MyProjects from '../components/MyProjects'
 import { server } from '../util/server'
+import { useRouter } from 'next/router'
 
 
 export default function Home(props) {
     const {session, myProjects} = props
     const theme = useTheme()
+    const router = useRouter()
     const [tabValue, setTabValue] = useState('1')
     const [showModal, setShowModal] = useState(false)
     const [projectNameInput, setProjectNameInput] = useState('')
@@ -43,7 +45,9 @@ export default function Home(props) {
             if(data.statusCode == 201){
                 console.log({Data: data})
                 closeModal()
+                
                 createAlert('success', data.message)
+                router.replace(router.asPath)
             } else {
                 console.log({Error: data})
                 closeModal()

@@ -4,6 +4,7 @@ import '../styles/globals.css'
 import theme from '../theme'
 import {SessionProvider} from 'next-auth/react'
 import 'sweetalert2/src/sweetalert2.scss'
+import 'quill/dist/quill.snow.css';
 
 function MyApp({ Component, pageProps }) {
     return (

@@ -6,7 +6,8 @@ const documentSchema = new mongoose.Schema({
         required: true
     },
     data: {
-        type: Object,
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
     },
     project: {
         type: mongoose.Schema.Types.ObjectId,
@@ -24,6 +25,6 @@ const documentSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     }
-})
+}, {minimize: false})
 
 export default mongoose.models.Document || mongoose.model("Document", documentSchema);

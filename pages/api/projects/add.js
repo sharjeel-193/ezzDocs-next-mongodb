@@ -34,7 +34,7 @@ const addProject =  async (req, res) => {
             if (error.name == 'ValidationError'){
                 res.status(406).json({
                     statusCode: 406,
-                    message: error.message
+                    error: error.message
                 })
             } else {
                 res.status(500).json({
