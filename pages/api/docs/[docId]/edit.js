@@ -15,9 +15,9 @@ const editDocuments = async (req, res) => {
             const response  = await Document.findByIdAndUpdate(
                 docID,
                 req.body,
-                // {
-                //     new: true
-                // }
+                {
+                    new: true
+                }
             )
             res.status(200).json({
                 statusCode: 200,
