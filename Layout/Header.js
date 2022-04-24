@@ -6,8 +6,8 @@ import {
     bindMenu,
     bindPopover,
   } from 'material-ui-popup-state/hooks'
-import TextLogo from '../public/images/text-logo.png'
-import IconLogo from '../public/images/icon-logo.png'
+import TextLogo from '../public/images/text-logo.PNG'
+import IconLogo from '../public/images/icon-logo.PNG'
 import ProfileDummy from '../public/images/profile-dummy.jpg'
 import Image from 'next/image'
 import Link from 'next/link'
