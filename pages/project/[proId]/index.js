@@ -1,4 +1,4 @@
-import { Box, Container, IconButton, Paper, Typography, useMediaQuery, useTheme, Modal, Backdrop, Fade, Input, TextField, Button } from "@mui/material"
+import { Box, Container, IconButton, Paper, Typography, useMediaQuery, useTheme, Modal, Backdrop, Fade, Input, TextField, Button, Tooltip, Autocomplete, Icon } from "@mui/material"
 import moment from "moment"
 import { route } from "next/dist/server/router";
 import Image from "next/image";
@@ -21,13 +21,22 @@ const Project = (props) => {
     const reqResp = useMediaQuery(theme.breakpoints.down('md'))
     const [docNameInput, setDocNameInput] = useState('')
     const [showModal, setShowModal] = useState(false)
+    const [searchModal, setSearchModal] = useState(false)
+    const [searchUser, setSearchUSer] = useState('')
+    const [searchOptions, setSearchOptions] = useState([])
+    const colabs = [1,2,3,4,5]
     const openModal = () => {
         setShowModal(true)
     }
     const closeModal = () => {
         setShowModal(false)
     }
-   
+    const openSearchModal = () => {
+        setSearchModal(true)
+    }
+    const closeSearchModal = () => {
+        setSearchModal(false)
+    }
     const createDocument = async () => {
         console.log('Inside Create Doc Function')
         fetch(`/api/projects/${proId}/add`, {
@@ -56,6 +65,26 @@ const Project = (props) => {
                 
             }
         })
+    }
+    const getSearchUsers = async (str) => {
+        const searchedData = await fetch(
+            `/api/users/search?name=${str}`,
+            {
+                method: 'GET'
+            }
+        )
+        const data = await searchedData.json()
+        console.log({Search: data})
+        return data
+    }
+    const onSearchChange= async(e) => {
+        if (e.target.value) {
+            const data = await getSearchUsers(e.target.value);
+            if(data){
+                setSearchOptions(data.users);
+                console.log('Options RESET')
+            }
+        }
     }
     const createAlert = (type, message) => {
         MySwal.fire({
@@ -109,6 +138,58 @@ const Project = (props) => {
                     </Box>
                 </Box>
             </Fade>
+        </Modal>
+    )
+    const createSearchModal = (
+        <Modal
+            open={searchModal}
+            onClose={closeSearchModal}
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{
+                timeout: 500,
+            }}
+        >
+            <Fade in={searchModal}>
+                <Box
+                    sx={{
+                        width: '80%',
+                        maxWidth: '500px',
+                        backgroundColor:'white',
+                        padding: 3,
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        borderRadius: 3
+                    }}
+                >
+                    <Typography variant="h5" component="h2" marginBottom={3}>Search For Collaborators</Typography>
+                    <Autocomplete
+                        freeSolo
+                        fullWidth
+                        filterOptions={(x) => x}
+                        onChange={(e) => setSearchUSer(e.target.innerText)}
+                        options={!searchOptions ? [] : searchOptions.map((obj) => obj.name)}
+                        renderInput={(params) => (
+                            <TextField {...params} label={'Search'} onChange={(e) => onSearchChange(e)} />
+                        )}
+
+                    >
+
+                    </Autocomplete>
+                    <Box
+                        sx={{
+                            width: '100%',
+                            textAlign:'right',
+                        }}
+                        marginTop={3}
+                    >
+                        <Button variant='contained' sx={{textTransform: 'capitalize'}} >Add Collaborators</Button>
+                    </Box>
+                </Box>
+            </Fade>
+
         </Modal>
     )
     return (
@@ -165,9 +246,42 @@ const Project = (props) => {
                                                     justifyContent={'flex-end'}
                                                     marginTop={1}
                                                 >
-                                                    <Typography variant={'body1'} component={'p'} marginRight={1}>
+                                                    <Typography variant={'body1'} component={'p'} marginRight={2}>
                                                         <i>Shared With </i>
                                                     </Typography>
+                                                    <Box display={'flex'} alignItems={'center'}>
+                                                        {colabs.map((item,index) => (
+                                                            <Tooltip key={index} title={item}>
+                                                                <Box
+                                                                    position={'relative'}
+                                                                    width={'30px'}
+                                                                    height={'30px'}
+                                                                    border={'1px solid white'}
+                                                                    borderRadius={'50%'}
+                                                                    overflow={'hidden'}
+                                                                    key={index}
+                                                                    marginLeft={-1}
+                                                                >
+                                                                    <Image src={project.project.owner.image} alt="Profile Photo" layout="fill" />
+                                                                </Box>
+                                                            </Tooltip>
+                                                        ))}
+                                                        <IconButton
+                                                            onClick={openSearchModal}
+                                                            sx={{
+                                                                width: '30px',
+                                                                height: '30px',
+                                                                marginLeft: -1,
+                                                                backgroundColor: 'white',
+                                                                '&:hover':{
+                                                                    backgroundColor: theme.palette.primary.main,
+                                                                    color : 'white'
+                                                                }
+                                                            }}
+                                                        >
+                                                            <MdOutlineAdd />
+                                                        </IconButton>
+                                                    </Box>
                                                 </Box>
                                             </Box>
                                         </Box>
@@ -177,6 +291,7 @@ const Project = (props) => {
                             
                             <Box>
                                 {createDocumentModal}
+                                {createSearchModal}
                                 <Container>
                                     <Box width={'90%'} margin={'0 auto'} display={'flex'} justifyContent={'center'}>
                                         <Paper elevation={3}
@@ -195,6 +310,7 @@ const Project = (props) => {
                                                 marginBottom={2}
                                             >
                                                 <Typography variant="h5" component={'h3'}>Documents</Typography>
+                                                
                                                 <IconButton
                                                     sx={{
                                                         border: `1px solid ${theme.palette.primary.main}`,

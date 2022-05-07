@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import {Box, IconButton, Paper, Typography} from '@mui/material'
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
@@ -17,10 +17,10 @@ import {MdEdit, MdOutlineFileDownload, MdOutlineDelete} from 'react-icons/md'
 // import { pdfExporter } from 'quill-to-pdf';
 import { saveAs } from 'file-saver';
 
-const QuillNoSSRWrapper = dynamic(import('react-quill'), {
-    ssr: false,
-    loading: () => <p>Loading ...</p>,
-})
+// const QuillNoSSRWrapper = dynamic(import('react-quill'), {
+//     ssr: false,
+//     loading: () => <p>Loading ...</p>,
+// })
   
 
 const quillTheme = 'snow'
@@ -72,7 +72,7 @@ function TextEditor(props) {
     });
     useEffect(() => {
         if(quill){
-            quill.setContents(doc.data)
+            quill.setContents(doc.data==null?'':doc.data)
             quill.on('text-change', (delta, oldDelta, source) => {
                 console.log('Text change!');
                 // console.log(quill.getText()); // Get text only
@@ -85,6 +85,7 @@ function TextEditor(props) {
 
     useEffect(() => {
         
+        
         const interval = setInterval(() => {
             if(quill){
                 updateDocument()
@@ -92,38 +93,72 @@ function TextEditor(props) {
         }, 10000);
         
         return () => clearInterval(interval);
-    }, [])
+    }, [quill, updateDocument])
 
-    setInterval(updateDocument, 5000)
-
-    const updateDocument = () => {
-        console.log('Inside Update Function')
-        console.log({Data: quill.getContents()})
-        fetch(`/api/docs/${doc._id}/edit`, {
-            body:JSON.stringify({
-                data: quill.getContents(),
-                updatedAt: new Date()
-            }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-            method: "PUT",
-        })
-        .then((res) => res.json())
-        .then((data) => {
-            
-            if(data.statusCode == 200){
-                console.log({Data: data})
-                setSaveError(null)
-                setSaveDate(data.document.updatedAt)
-            } else {
-                console.log({Error: data})
-                setSaveError('Saving Failed ... ')
+    // const updateDocument = async () => {
+    //     console.log('Inside Update Function')
+    //     if(quill){
+    //         console.log(quill==undefined)
+    //         console.log({Content: quill.getContents()})
+    //         fetch(`/api/docs/${doc._id}/edit`, {
+    //             body:JSON.stringify({
+    //                 data: quill.getContents(),
+    //                 updatedAt: new Date()
+    //             }),
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             method: "PUT",
+    //         })
+    //         .then((res) => res.json())
+    //         .then((data) => {
                 
-            }
-        })
-    }
+    //             if(data.statusCode == 200){
+    //                 console.log({Data: data})
+    //                 setSaveError(null)
+    //                 setSaveDate(data.document.updatedAt)
+    //             } else {
+    //                 console.log({Error: data})
+    //                 setSaveError('Saving Failed ... ')
+                    
+    //             }
+    //         })
+    //     }
+    // }
 
+    const updateDocument = useCallback(async() => {
+        console.log('Inside Update Function')
+        if(quill){
+            console.log(quill==undefined)
+            console.log({Content: quill.getContents()})
+            fetch(`/api/docs/${doc._id}/edit`, {
+                body:JSON.stringify({
+                    data: quill.getContents(),
+                    updatedAt: new Date()
+                }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                method: "PUT",
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                
+                if(data.statusCode == 200){
+                    console.log({Data: data})
+                    setSaveError(null)
+                    setSaveDate(data.document.updatedAt)
+                } else {
+                    console.log({Error: data})
+                    setSaveError('Saving Failed ... ')
+                    
+                }
+            })
+        }
+    }, [quill,doc])
+
+    // setInterval(updateDocument, 5000)
+    // setTimeout(updateDocument, 10000)
     const downloadDocument = async () => {
         // const delta = quill.getContents()
         // const pdfasBlob = await pdfExporter.generatePdf(delta);

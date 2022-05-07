@@ -4,7 +4,8 @@ import Document from "../../../../models/Document"
 
 const editDocuments = async (req, res) => {
     const session = await getSession({req});
-    const user = session.user;
+    const user = session?session.user:false;
+    // console.log(user)
     const docID = req.query.docId;
 
     await dbConnect()
@@ -15,10 +16,12 @@ const editDocuments = async (req, res) => {
             const response  = await Document.findByIdAndUpdate(
                 docID,
                 req.body,
+                
                 {
                     new: true
                 }
             )
+            console.log({Response: response})
             res.status(200).json({
                 statusCode: 200,
                 document: response,
