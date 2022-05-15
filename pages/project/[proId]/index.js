@@ -1,6 +1,7 @@
 import { Box, Container, IconButton, Paper, Typography, useMediaQuery, useTheme, Modal, Backdrop, Fade, Input, TextField, Button, Tooltip, Autocomplete, Icon } from "@mui/material"
 import moment from "moment"
 import { route } from "next/dist/server/router";
+import { useSession } from "next-auth/react"
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -11,25 +12,28 @@ import Loading from "../../../components/Loading";
 import { server } from "../../../util/server";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import SearchCollaboratorModal from "../../../components/modals/SearchCollaboratorModal";
+import CreateDocumentModal from "../../../components/modals/CreateDocumentModal";
 
 const Project = (props) => {
     const theme = useTheme();
     const router = useRouter()
     const MySwal = withReactContent(Swal)
     const {project, documents} = props
+    const {data: session} = useSession()
     const { proId } = router.query
     const reqResp = useMediaQuery(theme.breakpoints.down('md'))
     const [docNameInput, setDocNameInput] = useState('')
-    const [showModal, setShowModal] = useState(false)
+    const [docModal, setDocModal] = useState(false)
     const [searchModal, setSearchModal] = useState(false)
-    const [searchUser, setSearchUSer] = useState('')
+    const [searchUser, setSearchUser] = useState('')
     const [searchOptions, setSearchOptions] = useState([])
     const colabs = [1,2,3,4,5]
-    const openModal = () => {
-        setShowModal(true)
+    const openDocModal = () => {
+        setDocModal(true)
     }
-    const closeModal = () => {
-        setShowModal(false)
+    const closeDocModal = () => {
+        setDocModal(false)
     }
     const openSearchModal = () => {
         setSearchModal(true)
@@ -95,103 +99,7 @@ const Project = (props) => {
         })
         
     }
-    const createDocumentModal = (
-        <Modal
-            open={showModal}
-            onClose={closeModal}
-            closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500,
-            }}
-        >
-            <Fade in={showModal}>
-                <Box
-                    sx={{
-                        width: '80%',
-                        maxWidth: '500px',
-                        backgroundColor:'white',
-                        padding: 3,
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        borderRadius: 3
-                    }}
-                >
-                    <Typography variant="h5" component="h2" marginBottom={3}>Create New Document</Typography>
-                    <TextField 
-                        type={'text'} 
-                        variant='outlined' 
-                        fullWidth 
-                        label='Document Name'
-                        onChange={(e) => setDocNameInput(e.target.value)}    
-                    />
-                    <Box
-                        sx={{
-                            width: '100%',
-                            textAlign:'right',
-                        }}
-                        marginTop={3}
-                    >
-                        <Button variant='contained' sx={{textTransform: 'capitalize'}} onClick={createDocument}>Create</Button>
-                    </Box>
-                </Box>
-            </Fade>
-        </Modal>
-    )
-    const createSearchModal = (
-        <Modal
-            open={searchModal}
-            onClose={closeSearchModal}
-            closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500,
-            }}
-        >
-            <Fade in={searchModal}>
-                <Box
-                    sx={{
-                        width: '80%',
-                        maxWidth: '500px',
-                        backgroundColor:'white',
-                        padding: 3,
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        borderRadius: 3
-                    }}
-                >
-                    <Typography variant="h5" component="h2" marginBottom={3}>Search For Collaborators</Typography>
-                    <Autocomplete
-                        freeSolo
-                        fullWidth
-                        filterOptions={(x) => x}
-                        onChange={(e) => setSearchUSer(e.target.innerText)}
-                        options={!searchOptions ? [] : searchOptions.map((obj) => obj.name)}
-                        renderInput={(params) => (
-                            <TextField {...params} label={'Search'} onChange={(e) => onSearchChange(e)} />
-                        )}
-
-                    >
-
-                    </Autocomplete>
-                    <Box
-                        sx={{
-                            width: '100%',
-                            textAlign:'right',
-                        }}
-                        marginTop={3}
-                    >
-                        <Button variant='contained' sx={{textTransform: 'capitalize'}} >Add Collaborators</Button>
-                    </Box>
-                </Box>
-            </Fade>
-
-        </Modal>
-    )
+    
     return (
         <div>
             {(project && documents)?(
@@ -290,8 +198,22 @@ const Project = (props) => {
                             </Box>
                             
                             <Box>
-                                {createDocumentModal}
-                                {createSearchModal}
+                                {/* {createDocumentModal} */}
+                                <CreateDocumentModal
+                                    docModal={docModal}
+                                    closeDocModal={closeDocModal}
+                                    setDocNameInput={setDocNameInput}
+                                    createDocument={createDocument}
+                                />
+                                <SearchCollaboratorModal 
+                                    searchModal={searchModal} 
+                                    closeSearchModal={closeSearchModal} 
+                                    setSearchUser={setSearchUser} 
+                                    searchOptions={searchOptions}
+                                    onSearchChange={onSearchChange}
+                                    user={session?.user?._id}
+                                    currentColabs={project.collaborators}
+                                />
                                 <Container>
                                     <Box width={'90%'} margin={'0 auto'} display={'flex'} justifyContent={'center'}>
                                         <Paper elevation={3}
@@ -321,7 +243,7 @@ const Project = (props) => {
                                                             color: 'white'
                                                         }
                                                     }}
-                                                    onClick={openModal}
+                                                    onClick={openDocModal}
                                                 >
                                                     <MdOutlineAdd />
                                                 </IconButton>
@@ -380,6 +302,7 @@ const Project = (props) => {
 export default Project
 
 export async function getServerSideProps(context){
+    
     const options = { 
         headers:{ 
             cookie: context.req.headers.cookie 
@@ -393,7 +316,8 @@ export async function getServerSideProps(context){
         return {
             props: {
                 project,
-                documents: {}
+                documents: {},
+                
             }
         }
     }
