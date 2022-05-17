@@ -90,6 +90,29 @@ const Project = (props) => {
             }
         }
     }
+    const addCollaborators = (selectedColabs) => {
+        console.log({"Collaborators to Add": selectedColabs})
+        fetch(`/api/projects/${proId}/collaborators/add`, {
+            method: 'PUT',
+            body:JSON.stringify({
+                collaborators: selectedColabs
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+        .then(res => res.json())
+        .then((data) => {
+            console.log({'Response': data})
+            if(data.statusCode==200){
+                createAlert('success', data.message)
+                
+            } else {
+                createAlert('error', data.error)
+            }
+            closeSearchModal()
+        })
+    }
     const createAlert = (type, message) => {
         MySwal.fire({
             title: '',
@@ -213,6 +236,7 @@ const Project = (props) => {
                                     onSearchChange={onSearchChange}
                                     user={session?.user?._id}
                                     currentColabs={project.collaborators}
+                                    addCollaborators={addCollaborators}
                                 />
                                 <Container>
                                     <Box width={'90%'} margin={'0 auto'} display={'flex'} justifyContent={'center'}>

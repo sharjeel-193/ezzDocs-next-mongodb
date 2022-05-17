@@ -1,13 +1,38 @@
 import {Modal, Fade, Box, Button, Typography, TextField, Autocomplete, Backdrop, Chip} from '@mui/material'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 function SearchCollaboratorModal(props) {
-    const {searchModal, closeSearchModal, setSearchUser, searchOptions, onSearchChange, user, currentColabs} = props
+    const {searchModal, closeSearchModal, setSearchUser, searchOptions, onSearchChange, user, currentColabs, addCollaborators} = props
     const [selectedColabs, setSelectedColabs] = useState([])
+    const router = useRouter()
+    const { proId } = router.query
     useEffect(() => {
         console.log({'Props in Search Volab: ': user})
     }, [user])
     
+    // const addCollaborators = () => {
+    //     console.log({"Collaborators to Add": selectedColabs[0]})
+    //     fetch(`/api/projects/${proId}/collaborators/add`, {
+    //         method: 'PUT',
+    //         body:JSON.stringify({
+    //             collaborators: selectedColabs[0]
+    //         }),
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //         }
+    //     })
+    //     .then(res => res.json())
+    //     .then((data) => {
+    //         console.log({'Response': data})
+    //     })
+    // }
+    const selColabExists = (userOpt) => {
+        const val = selectedColabs.some(col => col._id==userOpt._id)
+        console.log({'Selected': selectedColabs})
+        console.log({Exists: val, user: userOpt})
+        return !val
+    }
     return (
         <Modal
             open={searchModal}
@@ -37,23 +62,32 @@ function SearchCollaboratorModal(props) {
                         
                         multiple
                         fullWidth
-                        filterOptions={(x) => x}
+                        options={searchOptions.filter((opt) => (
+                            (opt._id!==user)
+                        ))}
                         getOptionLabel={(option)=>(option.name)}
-                        // onChange={(e) => setSearchUser(e.target.innerText)}
-                        // value={selectedColabs}
+                        filterOptions={(opt) => {
+                            if(selColabExists(opt)){
+                                return opt
+                            } else {
+                                return opt
+                            }
+                        }}
+                        filterSelectedOptions
                         onChange={(e, newValue) => {
                             setSelectedColabs([
                                 newValue
                             ])
-                            console.log(newValue)
+                            console.log({'New Selected Colabs': newValue})
                         }}
                         
 
-                        options={searchOptions.filter((opt) => ((opt._id!==user)))}
+                        
+                        // options={searchOptions.filter((opt) => !(selColabExists(opt)))}
                         renderInput={(params) => (
                             <TextField {...params} label={'Search'} onChange={(e) => onSearchChange(e)} />
                         )}
-                        filterSelectedOptions
+                        
                         
                         renderOption={(props, option) => (
                             <Box
@@ -82,20 +116,7 @@ function SearchCollaboratorModal(props) {
                     >
 
                     </Autocomplete>
-                    {/* <Box
-                        sx={{
-                            width: '100%',
-                            textAlign:'right',
-                        }}
-                        marginTop={3}
-                    >
-                        {selectedColabs.map((item, index) => {
-                            <Chip
-                                label={item.name}
-                                key={index}
-                            />
-                        })}
-                    </Box> */}
+                    
                     <Box
                         sx={{
                             width: '100%',
@@ -103,7 +124,7 @@ function SearchCollaboratorModal(props) {
                         }}
                         marginTop={3}
                     >
-                        <Button variant='contained' sx={{textTransform: 'capitalize'}} >Add Collaborators</Button>
+                        <Button variant='contained' sx={{textTransform: 'capitalize'}} onClick={() => addCollaborators(selectedColabs[0])} >Add Collaborators</Button>
                     </Box>
                 </Box>
             </Fade>
