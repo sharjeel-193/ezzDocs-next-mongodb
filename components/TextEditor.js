@@ -95,36 +95,7 @@ function TextEditor(props) {
         return () => clearInterval(interval);
     }, [quill, updateDocument])
 
-    // const updateDocument = async () => {
-    //     console.log('Inside Update Function')
-    //     if(quill){
-    //         console.log(quill==undefined)
-    //         console.log({Content: quill.getContents()})
-    //         fetch(`/api/docs/${doc._id}/edit`, {
-    //             body:JSON.stringify({
-    //                 data: quill.getContents(),
-    //                 updatedAt: new Date()
-    //             }),
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             method: "PUT",
-    //         })
-    //         .then((res) => res.json())
-    //         .then((data) => {
-                
-    //             if(data.statusCode == 200){
-    //                 console.log({Data: data})
-    //                 setSaveError(null)
-    //                 setSaveDate(data.document.updatedAt)
-    //             } else {
-    //                 console.log({Error: data})
-    //                 setSaveError('Saving Failed ... ')
-                    
-    //             }
-    //         })
-    //     }
-    // }
+    
 
     const updateDocument = useCallback(async() => {
         console.log('Inside Update Function')

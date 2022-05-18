@@ -1,4 +1,4 @@
-import { Box, Container, IconButton, Paper, Typography, useMediaQuery, useTheme, Modal, Backdrop, Fade, Input, TextField, Button, Tooltip, Autocomplete, Icon } from "@mui/material"
+import { Box, Container, IconButton, Paper, Typography, useMediaQuery, useTheme, Tooltip,} from "@mui/material"
 import moment from "moment"
 import { route } from "next/dist/server/router";
 import { useSession } from "next-auth/react"
@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import {MdOutlineAdd} from 'react-icons/md'
+import {MdOutlineAdd, MdSettings} from 'react-icons/md'
 import ErrorBox from "../../../components/ErrorBox";
 import Loading from "../../../components/Loading";
 import { server } from "../../../util/server";
@@ -28,7 +28,7 @@ const Project = (props) => {
     const [searchModal, setSearchModal] = useState(false)
     const [searchUser, setSearchUser] = useState('')
     const [searchOptions, setSearchOptions] = useState([])
-    const colabs = [1,2,3,4,5]
+    
     const openDocModal = () => {
         setDocModal(true)
     }
@@ -106,6 +106,7 @@ const Project = (props) => {
             console.log({'Response': data})
             if(data.statusCode==200){
                 createAlert('success', data.message)
+                router.replace(router.asPath)
                 
             } else {
                 createAlert('error', data.error)
@@ -170,6 +171,13 @@ const Project = (props) => {
                                                     >
                                                         <Image src={project.project.owner.image} alt="Profile Photo" layout="fill" />
                                                     </Box>
+                                                    <Tooltip title={'Settings'}>
+                                                        <Link href={`/project/${project.project._id}/settings`} passHref>
+                                                            <IconButton>
+                                                                <MdSettings />
+                                                            </IconButton>
+                                                        </Link>
+                                                    </Tooltip>
                                                 </Box>
                                                 <Box
                                                     display={'flex'}
@@ -181,8 +189,8 @@ const Project = (props) => {
                                                         <i>Shared With </i>
                                                     </Typography>
                                                     <Box display={'flex'} alignItems={'center'}>
-                                                        {colabs.map((item,index) => (
-                                                            <Tooltip key={index} title={item}>
+                                                        {project.project.collaborators.map((item,index) => (
+                                                            <Tooltip key={index} title={item.name}>
                                                                 <Box
                                                                     position={'relative'}
                                                                     width={'30px'}
@@ -193,7 +201,7 @@ const Project = (props) => {
                                                                     key={index}
                                                                     marginLeft={-1}
                                                                 >
-                                                                    <Image src={project.project.owner.image} alt="Profile Photo" layout="fill" />
+                                                                    <Image src={item.image} alt="Profile Photo" layout="fill" />
                                                                 </Box>
                                                             </Tooltip>
                                                         ))}
@@ -235,7 +243,7 @@ const Project = (props) => {
                                     searchOptions={searchOptions}
                                     onSearchChange={onSearchChange}
                                     user={session?.user?._id}
-                                    currentColabs={project.collaborators}
+                                    currentColabs={project.project.collaborators}
                                     addCollaborators={addCollaborators}
                                 />
                                 <Container>

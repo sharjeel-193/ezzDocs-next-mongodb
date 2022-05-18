@@ -25,6 +25,7 @@ const getProject =  async (req, res) => {
                     path: 'owner',
                     model: User
                 })
+                .populate('collaborators')
             console.log({Response: response})
             if(response.private){
                 if(!user || user._id != response.owner._id){

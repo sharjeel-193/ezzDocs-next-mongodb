@@ -11,26 +11,15 @@ function SearchCollaboratorModal(props) {
         console.log({'Props in Search Volab: ': user})
     }, [user])
     
-    // const addCollaborators = () => {
-    //     console.log({"Collaborators to Add": selectedColabs[0]})
-    //     fetch(`/api/projects/${proId}/collaborators/add`, {
-    //         method: 'PUT',
-    //         body:JSON.stringify({
-    //             collaborators: selectedColabs[0]
-    //         }),
-    //         headers: {
-    //             "Content-Type": "application/json",
-    //         }
-    //     })
-    //     .then(res => res.json())
-    //     .then((data) => {
-    //         console.log({'Response': data})
-    //     })
-    // }
+   
     const selColabExists = (userOpt) => {
         const val = selectedColabs.some(col => col._id==userOpt._id)
         console.log({'Selected': selectedColabs})
         console.log({Exists: val, user: userOpt})
+        return !val
+    }
+    const existInCurrentColabs = (userOpt) => {
+        const val = currentColabs.some(col => col._id==userOpt._id)
         return !val
     }
     return (
@@ -63,16 +52,12 @@ function SearchCollaboratorModal(props) {
                         multiple
                         fullWidth
                         options={searchOptions.filter((opt) => (
-                            (opt._id!==user)
+                            (opt._id!==user) && existInCurrentColabs(opt)
                         ))}
                         getOptionLabel={(option)=>(option.name)}
-                        filterOptions={(opt) => {
-                            if(selColabExists(opt)){
-                                return opt
-                            } else {
-                                return opt
-                            }
-                        }}
+                        // filterOptions={(opt) => {
+                            
+                        // }}
                         filterSelectedOptions
                         onChange={(e, newValue) => {
                             setSelectedColabs([
