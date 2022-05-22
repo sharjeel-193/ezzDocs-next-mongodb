@@ -1,11 +1,9 @@
-import mongoose from "mongoose";
-import { getSession, useSession } from "next-auth/react";
 import Project from '../../../models/Project'
 import User from '../../../models/User'
 import dbConnect from "../../../util/dbConnect";
+import { getSession, useSession } from "next-auth/react";
 
-const listProjects =  async (req, res) => {
-
+const listSharedProjects = async (req, res) => {
     const session = await getSession({req});
     const user = session.user
 
@@ -14,12 +12,13 @@ const listProjects =  async (req, res) => {
     if (!user) {
         return res.json({ error: "Not logged in" });
     }
-
     if (req.method === "GET") {
 
         try {
             const response = await Project
-                .find({owner: user._id})
+                .find({collaborators: {
+                    $all: [user._id]
+                } })
                 .populate({
                     path: 'owner',
                     model: User
@@ -38,6 +37,6 @@ const listProjects =  async (req, res) => {
             
         }
     }
-};
+}
 
-export default listProjects
+export default listSharedProjects

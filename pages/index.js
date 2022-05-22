@@ -8,10 +8,11 @@ import withReactContent from 'sweetalert2-react-content'
 import MyProjects from '../components/MyProjects'
 import { server } from '../util/server'
 import { useRouter } from 'next/router'
+import SharedProjects from '../components/SharedProjects'
 
 
 export default function Home(props) {
-    const {session, myProjects} = props
+    const {session, myProjects, sharedProjects} = props
     const theme = useTheme()
     const router = useRouter()
     const [tabValue, setTabValue] = useState('1')
@@ -177,7 +178,8 @@ export default function Home(props) {
                             <MyProjects projects={myProjects.projects} />}
                         </TabPanel>
                         <TabPanel value='2'>
-                            <Typography variant='h1'>TAB 2</Typography>
+                            {sharedProjects.projects &&
+                            <SharedProjects projects={sharedProjects.projects} />}
                         </TabPanel>
                     </TabContext>
                 </Box>
@@ -206,10 +208,14 @@ export async function getServerSideProps(context) {
     const myProjectRes = await fetch(`${server}/api/projects`, options)
     const myProjects = await myProjectRes.json()
     console.log({Projects: myProjects})
+    const sharedProjectRes = await fetch(`${server}/api/projects/shared`, options)
+    const sharedProjects = await sharedProjectRes.json()
+    console.log({'Shared Projects': sharedProjects})
     return {
         props: { 
             session,
-            myProjects: myProjects
+            myProjects: myProjects,
+            sharedProjects: sharedProjects
         }
     }
 }

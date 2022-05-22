@@ -1,7 +1,7 @@
 import { Box, Typography, useTheme } from "@mui/material"
 import Link from "next/link"
 
-function MyProjects(props) {
+function SharedProjects(props) {
     const theme = useTheme()
     
     const {projects} = props
@@ -40,4 +40,4 @@ function MyProjects(props) {
     )
 }
 
-export default MyProjects
+export default SharedProjects

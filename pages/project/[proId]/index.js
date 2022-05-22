@@ -59,12 +59,12 @@ const Project = (props) => {
             
             if(data.statusCode == 201){
                 console.log({Data: data})
-                closeModal()
+                closeDocModal()
                 router.replace(router.asPath)
                 createAlert('success', data.message)
             } else {
                 console.log({Error: data})
-                closeModal()
+                closeDocModal()
                 createAlert('error', data.error)
                 
             }

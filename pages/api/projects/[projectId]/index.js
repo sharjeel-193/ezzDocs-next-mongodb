@@ -4,6 +4,11 @@ import Project from '../../../../models/Project'
 import User from '../../../../models/User'
 import dbConnect from "../../../../util/dbConnect";
 
+const existInColabs = (colabs, userId) => {
+    const val = colabs.some(col => col._id==userId)
+    return !val
+}
+
 const getProject =  async (req, res) => {
 
     const session = await getSession({req});
@@ -15,6 +20,8 @@ const getProject =  async (req, res) => {
     // if (!user) {
     //     return res.json({ error: "Not logged in" });
     // }
+
+
 
     if (req.method === "GET") {
 
@@ -28,7 +35,7 @@ const getProject =  async (req, res) => {
                 .populate('collaborators')
             console.log({Response: response})
             if(response.private){
-                if(!user || user._id != response.owner._id){
+                if(!user || ((user._id != response.owner._id) && (existInColabs(response.collaborators, user._id)))){
                     res.status(403).json({
                         statusCode: 403,
                         error: 'Sorry, You Cannot access this project it is private'
