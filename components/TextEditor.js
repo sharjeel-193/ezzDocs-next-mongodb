@@ -17,6 +17,9 @@ import {BiDotsVertical} from 'react-icons/bi'
 import {MdEdit, MdOutlineFileDownload, MdOutlineDelete} from 'react-icons/md'
 // import { pdfExporter } from 'quill-to-pdf';
 import { saveAs } from 'file-saver';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import { useRouter } from 'next/router';
 
 // const QuillNoSSRWrapper = dynamic(import('react-quill'), {
 //     ssr: false,
@@ -32,6 +35,8 @@ function TextEditor(props) {
     const [saveDate, setSaveDate] = useState(doc.updatedAt) 
     // const [socket, setSocket] = useState()
     const SAVE_INTERVAL_MS = 2000
+    const MySwal = withReactContent(Swal)
+    const router = useRouter()
     let socket
     const modules = {
         toolbar: [
@@ -202,7 +207,51 @@ function TextEditor(props) {
         // const pdfasBlob = await pdfExporter.generatePdf(delta);
         // saveAs(pdfasBlob, `${doc.name}.pdf`)
     }
-    
+
+    const deleteDocument = () => {
+        fetch(`/api/docs/${doc._id}/delete`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            method: "DELETE",
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            
+            if(data.statusCode == 200){
+                console.log({Data: data})
+                createAlert('success', data.message)
+                router.replace(`/project/${doc.project._id}`)
+            } else {
+                createAlert('error', data.error)
+                
+            }
+        })
+    }
+    const confirmDeletion = () => {
+        MySwal.fire({
+            title: 'Confirm',
+            text: 'Are you sure, you want to delete this project?',
+            icon: 'warning',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            showCancelButton: true,
+            confirmButtonColor: 'red'
+        }).then((result) => {
+            console.log(result)
+            if(result.isConfirmed){
+                deleteDocument()
+            }
+        })
+    }
+    const createAlert = (type, message) => {
+        MySwal.fire({
+            title: '',
+            text: message,
+            icon: type=='error'?'error':'success',
+            confirmButtonText: 'Ok'
+        })  
+    }
     return (
         <div>
             <Box
@@ -236,7 +285,7 @@ function TextEditor(props) {
                 >
                     <MenuItem onClick={openNameModal}> <MdEdit style={{marginRight: '10px'}} />Edit</MenuItem>
                     <MenuItem onClick={downloadDocument}><MdOutlineFileDownload style={{marginRight: '10px'}} />Download</MenuItem>
-                    <MenuItem><MdOutlineDelete style={{marginRight: '10px'}} />Delete</MenuItem>
+                    <MenuItem onClick={confirmDeletion}><MdOutlineDelete style={{marginRight: '10px'}} />Delete</MenuItem>
                 </Menu>
                 </Box>
             </Box>

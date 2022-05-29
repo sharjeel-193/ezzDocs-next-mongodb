@@ -280,7 +280,7 @@ const Project = (props) => {
                                                     <MdOutlineAdd />
                                                 </IconButton>
                                             </Box>
-                                            {documents.documents && documents.documents.map((doc, index) => (
+                                            {documents.documents && documents.documents.filter(doc => doc.active).map((doc, index) => (
                                                 <Box 
                                                     key={`doc-${index}`} 
                                                     display={'flex'} 
