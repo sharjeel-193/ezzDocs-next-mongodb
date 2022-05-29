@@ -11,9 +11,7 @@ const existInColabs = (colabs, userId) => {
 
 const getProject =  async (req, res) => {
 
-    const session = await getSession({req});
-    const user = session? session.user: null
-    const projectID = req.query.projectId
+    
 
     await dbConnect();
 
@@ -26,6 +24,9 @@ const getProject =  async (req, res) => {
     if (req.method === "GET") {
 
         try {
+            const session = await getSession({req});
+            const user = session? session.user: null
+            const projectID = req.query.projectId
             const response = await Project
                 .findOne({_id: projectID})
                 .populate({

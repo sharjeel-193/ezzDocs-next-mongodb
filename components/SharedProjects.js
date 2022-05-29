@@ -10,7 +10,7 @@ function SharedProjects(props) {
             width='100%'
             // backgroundColor='yellow'
         >
-            {projects.map((project,index) => (
+            {projects.filter((pr) => pr.active).map((project,index) => (
                 <Box 
                     key={`my-project-${index}`}
                     marginY={1}

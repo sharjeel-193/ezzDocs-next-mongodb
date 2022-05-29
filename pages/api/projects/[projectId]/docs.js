@@ -9,9 +9,7 @@ import dbConnect from "../../../../util/dbConnect";
 
 const listDocuments =  async (req, res) => {
 
-    const session = await getSession({req});
-    const user = session? session.user: '';
-    const projectID = req.query.projectId
+    
 
     await dbConnect();
 
@@ -22,6 +20,9 @@ const listDocuments =  async (req, res) => {
     if (req.method === "GET") {
 
         try {
+            const session = await getSession({req});
+            const user = session? session.user: '';
+            const projectID = req.query.projectId
             const response = await Document
                 .find({project: projectID})
                 .populate({

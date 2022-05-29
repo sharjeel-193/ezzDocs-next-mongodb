@@ -82,6 +82,26 @@ function Settings(props) {
             }
         })
     }
+    const deleteProject = () => {
+        fetch(`/api/projects/${proId}/delete`, {
+            
+            headers: {
+                "Content-Type": "application/json",
+            },
+            method: "DELETE",
+        })
+        .then(res => res.json())
+        .then((data) => {
+            console.log({'Response': data})
+            if(data.statusCode==200){
+                createAlert('success', data.message)
+                router.replace('/')
+                
+            } else {
+                createAlert('error', data.error)
+            }
+        })
+    }
     const createAlert = (type, message) => {
         MySwal.fire({
             title: '',
@@ -90,6 +110,22 @@ function Settings(props) {
             confirmButtonText: 'Ok'
         })
         
+    }
+    const confirmDeletion = () => {
+        MySwal.fire({
+            title: 'Confirm',
+            text: 'Are you sure, you want to delete this project?',
+            icon: 'warning',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            showCancelButton: true,
+            confirmButtonColor: 'red'
+        }).then((result) => {
+            console.log(result)
+            if(result.isConfirmed){
+                deleteProject()
+            }
+        })
     }
     return (
         <div>
@@ -222,6 +258,9 @@ function Settings(props) {
                                 </Box>
                             ))}
                         </Box>
+                    </Box>
+                    <Box marginTop={3} textAlign='center'>
+                        <Button variant='outlined' color='error' onClick={confirmDeletion}>Delete this project</Button>
                     </Box>
                 </Container>
             </Box>
