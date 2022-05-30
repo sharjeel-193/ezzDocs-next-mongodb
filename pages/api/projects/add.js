@@ -4,26 +4,26 @@ import dbConnect from "../../../util/dbConnect";
 
 const addProject =  async (req, res) => {
 
-    const session = await getSession({req});
-    const user = session.user
+    
     // console.log(user)
 
     await dbConnect();
 
-    if (!user) {
-        return res.json({ error: "Not logged in" });
-    }
+    
 
     if (req.method === "POST") {
-        const project = new Project({
-            name: req.body.name,
-            owner: user._id,
-            private: true,
-            createdAt: new Date(),
-            collaborators: []
-        });
+        
 
         try {
+            const session = await getSession({req});
+            const user = session.user
+            const project = new Project({
+                name: req.body.name,
+                owner: user._id,
+                private: true,
+                createdAt: new Date(),
+                collaborators: []
+            });
             const response = await project.save()
             res.status(201).json({
                 project: response, 
@@ -39,7 +39,7 @@ const addProject =  async (req, res) => {
             } else {
                 res.status(500).json({
                     statusCode: 500,
-                    error: 'We Encountered Some Error, Please Try Again Later ...'
+                    error: 'Network Error'
                 })
             }
             

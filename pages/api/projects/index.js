@@ -6,18 +6,20 @@ import dbConnect from "../../../util/dbConnect";
 
 const listProjects =  async (req, res) => {
 
-    const session = await getSession({req});
-    const user = session.user
+    
 
     await dbConnect();
 
-    if (!user) {
-        return res.json({ error: "Not logged in" });
-    }
-
+    
     if (req.method === "GET") {
 
         try {
+            const session = await getSession({req});
+            const user = session.user
+            if (!user) {
+                return res.json({ error: "Not logged in" });
+            }
+        
             const response = await Project
                 .find({owner: user._id})
                 .populate({
